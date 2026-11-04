@@ -187,10 +187,12 @@ The function itself receives the resolved runtime value.
 
 ### Table
 
-Reference a table using `connector.sync`:
+Reference a synced table using `connector.sync`, or an uploaded table using
+`_upload.table_name`. `_upload` is reserved and cannot be a connector name:
 
 ```python
 Table("shopify.orders")
+Table("_upload.customers")  # Published with: vortexify upload table customers.csv --name customers
 ```
 
 Runtime resolution depends on the selected engine:
@@ -1071,7 +1073,6 @@ Set `provider` to `"openai"` or `"anthropic"` and `model` to that provider's mod
 
 ```python
 agent = Agent(
-    name="operations-agent",
     provider="openai",
     model="your-openai-model-id",
     prompt="Help manage operations.",
@@ -1091,7 +1092,6 @@ from vortexify import (
 
 
 agent = Agent(
-    name="operations-agent",
     prompt="Help manage operations.",
     context=[
         Table("shopify.orders"),
@@ -1145,8 +1145,17 @@ Commercial use of the SDK requires permission from Vortexify.
 
 Code, applications, workflows, configurations, and other materials created by users using the Vortexify SDK remain the property of those users and are not subject to the SDK license solely because they use or interact with the SDK.
 
+
+Python SDK 0.1.1 removes `Agent.name`. Declare `Agent(prompt=..., context=..., tools=...)`;
+use the registered resource name or ID in CLI/React calls. When upgrading existing
+source, remove the `name=` argument and update `requirements.in` to `vortexify==0.1.1`.
+
 <!-- sdk-release-history -->
 ## Changelog
+
+### v0.1.1
+
+- Remove Agent.name; agents use their registered resource identity. Remove name= from existing declarations when upgrading.
 
 ### v0.1.0
 

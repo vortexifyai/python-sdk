@@ -12,7 +12,7 @@ T = TypeVar(
 
 class Table:
     """
-    Reference to a table materialized by a registered Sync.
+    Reference to a synced table or a published uploaded table.
 
     At runtime, the table is resolved according to the resource engine:
     pandas -> pandas.DataFrame
@@ -26,7 +26,8 @@ class Table:
     ):
         """
         Args:
-            alias: Qualified connector.sync reference, such as "shopify.orders".
+            alias: Qualified connector.sync reference, such as "shopify.orders",
+                or "_upload.customers" for an uploaded table.
                 Stored unchanged; the platform interprets and validates it.
         """
         self.alias = alias

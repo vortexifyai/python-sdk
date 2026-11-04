@@ -8,10 +8,11 @@ from vortexify import (
 )
 
 
-def test_table():
-    table = Table("shopify.orders")
+@pytest.mark.parametrize("reference", ["shopify.orders", "_upload.customers"])
+def test_table(reference):
+    table = Table(reference)
 
-    assert table.alias == "shopify.orders"
+    assert table.alias == reference
 
 
 @pytest.mark.parametrize("reference", ["forecast", "forecast.weekly"])

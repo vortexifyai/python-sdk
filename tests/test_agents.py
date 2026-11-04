@@ -11,11 +11,10 @@ from vortexify import (
 
 
 def test_agent_defaults():
-    agent = Agent(
-        name="planner",
-    )
+    agent = Agent()
 
-    assert agent.name == "planner"
+    assert not hasattr(agent, "name")
+    assert "name" not in agent.model_dump()
     assert agent.provider is None
     assert agent.model is None
     assert agent.prompt == ""
@@ -28,7 +27,6 @@ def test_agent_defaults():
 @pytest.mark.parametrize("provider", ["openai", "anthropic"])
 def test_agent_model_provider_round_trip(provider):
     agent = Agent(
-        name="planner",
         provider=provider,
         model="provider-model-snapshot",
     )
@@ -41,11 +39,11 @@ def test_agent_model_provider_round_trip(provider):
 
 def test_agent_rejects_unsupported_provider():
     with pytest.raises(ValidationError, match="provider"):
-        Agent(name="planner", provider="unsupported")
+        Agent(provider="unsupported")
 
 
 def test_agent_provider_can_use_platform_default_model():
-    agent = Agent(name="planner", provider="anthropic")
+    agent = Agent(provider="anthropic")
 
     assert agent.provider == "anthropic"
     assert agent.model is None
@@ -68,7 +66,6 @@ def test_agent_context():
     ]
 
     agent = Agent(
-        name="planner",
         context=context,
     )
 
@@ -81,7 +78,6 @@ def test_agent_tools():
     )
 
     agent = Agent(
-        name="planner",
         tools=[
             runner,
         ],
@@ -95,12 +91,12 @@ def test_agent_tools():
 @pytest.mark.parametrize("tasks", [[], [{"name": "review", "prompt": "Review risks."}]])
 def test_agent_rejects_tasks(tasks):
     with pytest.raises(ValidationError, match="tasks"):
-        Agent(name="planner", tasks=tasks)
+        Agent(tasks=tasks)
 
 
 def test_agent_rejects_tasks_in_serialized_definition():
     with pytest.raises(ValidationError, match="tasks"):
-        Agent.model_validate_json('{"name":"planner","tasks":[]}')
+        Agent.model_validate_json('{"tasks":[]}')
 
 
 def test_task_is_not_exported():
@@ -112,9 +108,16 @@ def test_task_is_not_exported():
 
 def test_agent_rejects_file_context():
     with pytest.raises(ValidationError):
-        Agent(name="planner", context=[{"type": "file", "alias": "manual"}])
+        Agent(context=[{"type": "file", "alias": "manual"}])
 
 
 def test_agent_capabilities_reject_arbitrary_code_execution():
     with pytest.raises(ValidationError, match="code_execution"):
         AgentCapabilities(code_execution=True)
+
+
+def test_agent_rejects_removed_name_in_source_and_serialized_data():
+    with pytest.raises(ValidationError, match="name"):
+        Agent(name="planner")
+    with pytest.raises(ValidationError, match="name"):
+        Agent.model_validate_json('{"name":"planner"}')

@@ -34,11 +34,6 @@ class Agent(BaseModel):
     Defines a Vortexify Agent with context, tools, and capabilities.
     """
 
-    name: str
-    """
-    Name of the Agent.
-    """
-
     provider: Literal["openai", "anthropic"] | None = None
     """
     Model provider. When omitted, the platform selects its default provider.

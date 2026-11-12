@@ -579,9 +579,9 @@ def build_plan(
 
 A resource directory may define one validation function using `vxfy_validate`.
 
-Transform runs perform validation against real output and return a structured `ValidationResult`. Findings and validator exceptions are reported without failing a successful transform or blocking table publication. Automatic output validation is supported for transforms, not APIs. Neither preview nor deployed API requests automatically invoke `@vxfy_validate`; required request and business checks belong in the API implementation or explicit tests. API validator declarations produce a non-blocking commit warning.
+Transform runs validate their output and return a structured `ValidationResult`. Findings and validator exceptions are reported without failing a successful transform or blocking table publication. APIs do not run output validators automatically; put required checks in the API implementation or explicit tests.
 
-Transform runtime results include a separate `validation` report with `status` (`passed`, `issues_found`, `error`, or `skipped`), `valid`, `issues`, and `error`. Skipped transform reports use reason `not_defined`. API CLI output omits validation status. Reports are also emitted as JSON logs and saved with the job. SDK mock tests do not automatically invoke these validators.
+Transform runtime results include a separate `validation` report with `status` (`passed`, `issues_found`, `error`, or `skipped`), `valid`, `issues`, and `error`. Skipped transform reports use reason `not_defined`. Reports are also emitted as JSON logs and saved with the job. SDK mock tests do not automatically invoke these validators.
 
 ```python
 import pandas as pd
@@ -750,11 +750,7 @@ tests serially. Patches affect the Python process running the test, so keep them
 
 ### Run your resource tests
 
-Use the CLI for platform verification. It runs SDK mock tests **on the server**
-against the selected immutable committed resource version, including its saved
-tests and mock factories, with its selected dependency image. Results are recorded
-with that version's job. This ties the check to the source and runtime the platform
-will execute, rather than uncommitted local files or a developer's Python setup.
+Commit your resource, then run its mock tests on the server. Results are saved with the tested resource version.
 
 ```sh
 vortexify commit --type transform --resource order_totals
@@ -773,10 +769,7 @@ checks do not validate DataFrame columns or business rules: write assertions for
 those contracts. Explicit mock scenarios keep tests independent of changing live
 data; production output validation and preview integration checks remain separate.
 
-For optional quick feedback, use the same runner locally. Local results do not
-submit a platform job or establish that the committed version passes on the server.
-Run locally from a resource directory containing `main.py` and `checks.py`, after
-installing the resource's dependencies in your Python environment:
+For quick local feedback, run the tests from the resource directory after installing its dependencies:
 
 ```sh
 python -m pip install -r requirements.in
@@ -1224,18 +1217,6 @@ Commercial use of the SDK requires permission from Vortexify.
 
 Code, applications, workflows, configurations, and other materials created by users using the Vortexify SDK remain the property of those users and are not subject to the SDK license solely because they use or interact with the SDK.
 
-
-Python SDK 0.1.1 removes `Agent.name`. Declare `Agent(prompt=..., context=..., tools=...)`;
-use the registered resource name or ID in CLI/React calls. When upgrading existing
-source, remove the `name=` argument and update `requirements.in` to `vortexify==0.1.1`.
-
-## Unreleased documentation updates
-
-- Clarify psycopg2 connections, parameterized SQL, transaction ownership and preview/origin selection.
-- Explain committed-version server mock tests, explicit mock inputs and separate integration verification.
-- Correct API validation guidance: automatic output validation runs for transforms only.
-
-These changes document existing runtime behavior; the Python SDK remains 0.1.1.
 
 <!-- sdk-release-history -->
 ## Changelog

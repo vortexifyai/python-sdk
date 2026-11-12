@@ -27,8 +27,13 @@ class Database:
     """
     Reference to a Vortexify-managed database for operational access.
 
-    At runtime, Database resolves to a permission-scoped Postgres connection
-    that can access the declared tables.
+    At runtime, Database resolves to a permission-scoped psycopg2 connection
+    that can access the declared tables. Use cursor.execute(sql, parameters)
+    with %s value placeholders. Autocommit is off; the runtime commits read_write
+    connections after successful function/output processing and closes them on
+    exit, discarding any uncommitted work. If catching a database error and
+    continuing, roll back before reusing the connection. Manual commits cannot
+    be undone by a later runtime failure. Mock tests own their supplied connections.
     """
 
     def __init__(

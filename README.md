@@ -268,6 +268,8 @@ float
 bool
 ```
 
+`Input(float)` accepts whole numbers, including defaults, and resolves them to Python floats. It does not accept booleans or numeric strings.
+
 The function receives the resolved scalar directly:
 
 ```python
@@ -580,6 +582,8 @@ def build_plan(
 A resource directory may define one validation function using `vxfy_validate`.
 
 Transform runs validate their output and return a structured `ValidationResult`. Findings and validator exceptions are reported without failing a successful transform or blocking table publication. APIs do not run output validators automatically; put required checks in the API implementation or explicit tests.
+
+Pandas and PySpark validators receive `output`: a DataFrame for one table, or a dictionary of DataFrames for named outputs (for example, `output["daily"]`). DuckDB validators receive `conn`, with tables registered as `output` or under their output names.
 
 Transform runtime results include a separate `validation` report with `status` (`passed`, `issues_found`, `error`, or `skipped`), `valid`, `issues`, and `error`. Skipped transform reports use reason `not_defined`. Reports are also emitted as JSON logs and saved with the job. SDK mock tests do not automatically invoke these validators.
 
@@ -1218,8 +1222,11 @@ Commercial use of the SDK requires permission from Vortexify.
 Code, applications, workflows, configurations, and other materials created by users using the Vortexify SDK remain the property of those users and are not subject to the SDK license solely because they use or interact with the SDK.
 
 
-<!-- sdk-release-history -->
 ## Changelog
+
+### v0.1.2
+
+- Accept whole-number values and defaults for float inputs, normalizing them to Python floats.
 
 ### v0.1.1
 
@@ -1228,4 +1235,3 @@ Code, applications, workflows, configurations, and other materials created by us
 ### v0.1.0
 
 - Initial release.
-<!-- /sdk-release-history -->

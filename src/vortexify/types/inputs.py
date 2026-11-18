@@ -102,6 +102,9 @@ class Input(Generic[T]):
                 "Input type must be str, int, float, or bool."
             )
 
+        if type_ is float and type(default) in (int, float):
+            default = float(default)
+
         if (
             default is not None
             and type(default) is not type_

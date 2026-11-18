@@ -141,6 +141,8 @@ def _mock_inputs(definition, supplied):
         if isinstance(declaration, Input):
             if value is None and not declaration.required:
                 continue
+            if declaration.type is float and type(value) in (int, float):
+                value = values[name] = float(value)
             if type(value) is not declaration.type:
                 raise TypeError(f"Mock input '{name}' must be {declaration.type.__name__}.")
         elif isinstance(declaration, (Table, TransformOutput, DatabaseTable)):

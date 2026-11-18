@@ -330,3 +330,21 @@ def test_factory_exception_remains_catchable():
 
     result = check(resource, factory, body)
     assert result.status == "passed" and result.run_count == 1
+
+
+@pytest.mark.parametrize("value", [153, 153.5])
+def test_float_mock_inputs_are_normalized(value):
+    @vxfy_api('/amount', inputs={'amount': Input(float)})
+    def resource(amount):
+        assert type(amount) is float
+        return amount
+    assert check(resource, lambda: {'amount': value}).status == 'passed'
+
+
+@pytest.mark.parametrize("value", [True, '153'])
+def test_float_mock_inputs_reject_non_numbers(value):
+    @vxfy_api('/amount', inputs={'amount': Input(float)})
+    def resource(amount): return amount
+    result = check(resource, lambda: {'amount': value})
+    assert result.status == 'error'
+    assert result.error.type == 'TypeError'

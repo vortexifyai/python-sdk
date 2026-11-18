@@ -84,3 +84,9 @@ def test_file_declaration_is_removed():
     assert not hasattr(vortexify, "File")
     assert "File" not in vortexify.__all__
     assert not hasattr(inputs, "File")
+
+
+def test_float_default_accepts_whole_numbers_but_not_booleans():
+    assert type(Input(float, default=153).default) is float
+    with pytest.raises(ValueError, match="Input default"):
+        Input(float, default=True)
